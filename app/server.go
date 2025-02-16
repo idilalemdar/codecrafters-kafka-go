@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os"
@@ -21,9 +22,26 @@ func main() {
 		fmt.Println("Failed to bind to port 9092")
 		os.Exit(1)
 	}
-	_, err = l.Accept()
+	conn, err := l.Accept()
 	if err != nil {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
+
+	var byteArray [8]byte
+	binary.BigEndian.PutUint32(byteArray[4:], 7)
+
+	buff := make([]byte, 2048)
+	_, err = conn.Read(buff)
+	if err != nil {
+		fmt.Println("Error reading request: ", err.Error())
+		os.Exit(1)
+	}
+
+	write, err := conn.Write(byteArray[:])
+	if err != nil {
+		fmt.Println("Error sending response: ", err.Error())
+		os.Exit(1)
+	}
+	fmt.Printf("Wrote %d bytes\n", write)
 }
