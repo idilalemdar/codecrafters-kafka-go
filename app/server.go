@@ -38,6 +38,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	copy(byteArray[:4], buff[:4])
+	copy(byteArray[4:], buff[8:12])
+
 	write, err := conn.Write(byteArray[:])
 	if err != nil {
 		fmt.Println("Error sending response: ", err.Error())
